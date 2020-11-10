@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { Context } from "../store/appContext";
 import { Link } from "react-router-dom";
 
 import { ContactCard } from "../component/ContactCard.js";
@@ -6,8 +7,10 @@ import { Modal } from "../component/Modal";
 
 export const Contacts = () => {
 	const [state, setState] = useState({
-		showModal: false
+		showModal: false,
+		itemIndex: null
 	});
+	const { store, actions } = useContext(Context);
 
 	return (
 		<div className="container">
@@ -19,14 +22,28 @@ export const Contacts = () => {
 				</p>
 				<div id="contacts" className="panel-collapse collapse show" aria-expanded="true">
 					<ul className="list-group pull-down" id="contact-list">
-						<ContactCard onDelete={() => setState({ showModal: true })} />
-						<ContactCard />
-						<ContactCard />
-						<ContactCard />
+						{store.contacts.map((item, index) => {
+							return (
+								<ContactCard
+									key={index}
+									index={index}
+									name={item.full_name}
+									address={item.address}
+									phone={item.phone}
+									email={item.email}
+									id={item.id}
+									onDelete={() => setState({ showModal: true, itemIndex: item.id })}
+								/>
+							);
+						})}
 					</ul>
 				</div>
 			</div>
-			<Modal show={state.showModal} onClose={() => setState({ showModal: false })} />
+			<Modal
+				show={state.showModal}
+				onClose={() => setState({ showModal: false, itemIndex: null })}
+				itemIndex={state.itemIndex}
+			/>
 		</div>
 	);
 };
